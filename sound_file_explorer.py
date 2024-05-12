@@ -1,11 +1,10 @@
 """
 A Python script to explore sound files in a library.
 - The app has a GUI that displays the directories and files in a tree view.
-- The user can search for sound files by keyword.
-- The user can play and delete sound files.
-- The user can add and remove directories from the library.
-- Users can choose to open the file in its orginal location.
-- When certain directories are selected, the user will be able to view the files in the table.
+- Search for sounds by keyword
+- Play the soundfiles
+- Add and remove directories
+- View directories' contents in the table
 - Library information is stored in a pickled file.
 """
 
