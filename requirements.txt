@@ -1,0 +1,5 @@
+mutagen==1.47.0
+pyasn1==0.6.0
+pygame==2.5.2
+PySimpleGUI==5.0.4
+rsa==4.9

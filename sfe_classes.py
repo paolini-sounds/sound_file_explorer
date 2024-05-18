@@ -1,8 +1,6 @@
-import sys
 import os
 import pickle
 import PySimpleGUI as sg
-import subprocess
 import math
 import pygame as pg
 import time
@@ -136,12 +134,10 @@ class Directory:
     def getFiles(self):
         self.audio_files = set()
         # Get a list of audio files in the directory       
-        notAdded = 0
         for root, dirs, files in os.walk(self.path):
 
             for file in files:
                 file_type = os.path.splitext(file)[-1]
-
                 
                 if file_type in Directory.FILE_TYPES:
                     # Create a new File object and add it to self.audio_files
@@ -152,8 +148,6 @@ class Directory:
                 # Create a new Directory object for the current directory
                 self.subdirectories[root] = Directory(root)
         
-        if notAdded > 0:
-            print(f"{notAdded} directories were not added because they do not contain audio.")
         return self.audio_files            
 
 
@@ -251,37 +245,36 @@ class SoundFileExplorer:
     # Handles the event when a tree item is selected
     def handleTreeEvent(self, values):
         start_time = time.time()
-        try:
-            if '-TREE-' in values and values['-TREE-']:
-                # Get the key of the selected item
-                key = values['-TREE-'][0]
-                # Get the Directory object for the selected item
-                directory = self.directory_map[key]         
-                tableData = []
-                if len(directory.audio_files) == 0:
-                    return tableData
-                index = 0 #index to keep track of the file
-                # Add the audio files to the table
-                for file_path in directory.audio_files:
-                    #check if already in fileCache
-                    if file_path in self.fileCache:
-                        for file in self.fileCache[file_path]:
-                            file.index = index
-                            tableData.append([file.name, file.file_type, file.length, file.path])
-                            index += 1
-                    else:
-                        #load the file into the table
-                        file = File(file_path, self.file_queue)
+        if '-TREE-' in values and values['-TREE-']:
+            # Get the key of the selected item
+            key = values['-TREE-'][0]
+            # Get the Directory object for the selected item
+            directory = self.directory_map.get(key)
+            if not directory:
+                sg.PopupError("Directory not found.")
+                return    
+                 
+            tableData = []
+            if len(directory.audio_files) == 0:
+                return tableData
+            index = 0 #index to keep track of the file
+            # Add the audio files to the table
+            for file_path in directory.audio_files:
+                #check if already in fileCache
+                if file_path in self.fileCache:
+                    for file in self.fileCache[file_path]:
                         file.index = index
-                        file.getLength()
-                        self.fileCache[file.path] = [file]
                         tableData.append([file.name, file.file_type, file.length, file.path])
                         index += 1
-                end_time = time.time()
-                print(f"Time to update table: {end_time - start_time}")
-                return tableData
-        except Exception as e:
-            sg.popup_error(f"Failed to update table: {e}")
+                else:
+                    #load the file into the table
+                    file = self.loadFile(file_path, index)
+                    tableData.append([file.name, file.file_type, file.length, file.path])
+                    index += 1
+            end_time = time.time()
+            print(f"Time to update table: {end_time - start_time}")
+            return tableData
+        
             
     def saveState(self):
         # Use pickle to save the state of the explorer
@@ -315,13 +308,19 @@ class SoundFileExplorer:
                         index += 1
                 else:
                     #load the file into the table
-                    file = File(file_path, self.file_queue)
-                    file.getLength()
-                    file.index = index
-                    self.fileCache[file.path] = [file]
+                    file = self.loadFile(file_path, index)
                     tableData.append([file.name, file.file_type, file.length, file.path])
                     index += 1
+                    
             return tableData
             print(f"{sfe.matches } Matches for {values['-TERM-']} out of {sfe.records} records.")
         except Exception as e:
             sg.popup_error(f"Failed to update table: {e} : {file}")
+            
+    def loadFile(self, file_path, index):
+        file = File(file_path, self.file_queue)
+        file.getLength()
+        file.index = index
+        self.fileCache[file.path] = [file]
+        return file
+        
