@@ -17,6 +17,31 @@ The following features are currently under development:
 
 - **File Navigation:** The ability to open the location of the original files is being added.
 
+## Setup
+
+This project uses a virtual environment to manage dependencies. To set up the project:
+
+1. Clone the repository:
+https://github.com/paolini-sounds/sound_file_explorer
+
+3. Navigate to the project directory:
+  cd repository
+
+4. Create a virtual environment:
+  python3 -m venv env
+
+5. Activate the virtual environment:
+- On Windows:
+  ```
+  .\env\Scripts\activate
+  ```
+- On Unix or MacOS:
+  ```
+  source env/bin/activate
+  ```
+5. Install the required packages:
+   pip install -r requirements.txt
+
 ## Dependencies
 
 The application requires the following Python libraries:
