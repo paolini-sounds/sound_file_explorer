@@ -1,5 +1,3 @@
 __pycache__/
-*.pickle
-sfe_env
-
-
+*.pkl
+venv/
